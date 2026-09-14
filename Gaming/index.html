@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gaming Events Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="static/style/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Gaming Events Hub</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="event.html">Event Details</a></li>
+        <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
+        <li class="nav-item"><a class="nav-link" href="history.html">Booking History</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
+<header class="bg-primary text-white text-center py-5">
+  <h1>Gaming Events Hub</h1>
+  <p>Find and join gaming tournaments, LAN parties, and community events.</p>
+</header>
+
+<section class="container my-4">
+  <h2>Categories</h2>
+  <div class="row g-3">
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">FPS</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">MOBA</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">RPG</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">Fighting</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container my-4">
+  <h2>Upcoming Events</h2>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card">
+        <img src="static/img/fps.jpg" class="card-img-top" alt="FPS Tournament">
+        <div class="card-body">
+          <h5 class="card-title">FPS Tournament</h5>
+          <p class="card-text">Date: 2026-09-20</p>
+          <span class="badge bg-success">Open</span>
+          <a href="event.html" class="btn btn-primary mt-2">View Details</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <img src="static/img/moba.jpg" class="card-img-top" alt="MOBA Cup">
+        <div class="card-body">
+          <h5 class="card-title">MOBA Cup</h5>
+          <p class="card-text">Date: 2026-10-05</p>
+          <span class="badge bg-secondary">Inactive</span>
+          <a href="event.html" class="btn btn-primary mt-2">View Details</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <img src="static/img/rpg.jpg" class="card-img-top" alt="RPG Night">
+        <div class="card-body">
+          <h5 class="card-title">RPG Night</h5>
+          <p class="card-text">Date: 2026-11-01</p>
+          <span class="badge bg-danger">Sold Out</span>
+          <a href="event.html" class="btn btn-primary mt-2">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
