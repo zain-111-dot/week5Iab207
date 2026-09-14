@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Event Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="static/style/style.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Gaming Events Hub</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
+        <li class="nav-item"><a class="nav-link" href="history.html">Booking History</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
+<div class="container my-4">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <img src="static/img/sample_event.jpg" class="img-fluid rounded" alt="Event image">
+    </div>
+    <div class="col-md-6">
+      <h2>FPS Tournament</h2>
+      <p><strong>Category:</strong> FPS</p>
+      <p><strong>Venue:</strong> Online</p>
+      <p><strong>Date:</strong> 2026-09-20</p>
+      <p><strong>Time:</strong> 18:00–21:00</p>
+      <p>Lorem ipsum description of the gaming event. Replace this with your own text.</p>
+      <span class="badge bg-success">Open</span>
+
+      <hr>
+      <h4>Book Tickets</h4>
+      <form>
+        <div class="mb-3">
+          <label for="tickets" class="form-label">Number of tickets</label>
+          <input type="number" class="form-control" id="tickets" min="1" max="10">
+        </div>
+        <button type="button" class="btn btn-primary">Book Now</button>
+      </form>
+    </div>
+  </div>
+
+  <hr class="my-4">
+  <h4>Comments</h4>
+  <div class="mb-3">
+    <div class="border p-2 mb-2 rounded">
+      <strong>PlayerOne</strong> <span class="text-muted">2026-08-10</span>
+      <p>Looks like a great tournament!</p>
+    </div>
+    <div class="border p-2 mb-2 rounded">
+      <strong>GamerGirl</strong> <span class="text-muted">2026-08-12</span>
+      <p>What is the prize pool?</p>
+    </div>
+  </div>
+
+  <form>
+    <div class="mb-3">
+      <label for="comment" class="form-label">Post a comment</label>
+      <textarea class="form-control" id="comment" rows="3"></textarea>
+    </div>
+    <button type="button" class="btn btn-secondary">Post Comment</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
