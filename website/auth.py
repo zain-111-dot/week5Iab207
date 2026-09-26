@@ -1,3 +1,4 @@
+# edited by paolo
 from flask import Blueprint, flash, render_template, request, url_for, redirect
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user
@@ -26,9 +27,40 @@ def login():
             login_user(user)
             nextp = request.args.get('next') # this gives the url from where the login page was accessed
             print(nextp)
-            if next is None or not nextp.startswith('/'):
-                return redirect(url_for('index'))
+            if nextp is None or not nextp.startswith('/'):
+                return redirect(url_for('views.index'))
             return redirect(nextp)
         else:
             flash(error)
     return render_template('user.html', form=login_form, heading='Login')
+
+# this is the registration function
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    register_form = RegisterForm()
+    if register_form.validate_on_submit():
+        user_name = register_form.user_name.data
+        email = register_form.email.data
+        password = register_form.password.data
+        password_hash = generate_password_hash(password).decode('utf-8')
+
+        new_user = User(name=user_name,
+                         email=email,
+                         password_hash=password_hash,
+                         first_name=register_form.first_name.data,
+                         surname=register_form.surname.data,
+                         contact_number=register_form.contact_number.data,
+                         street_address=register_form.street_address.data)
+        db.session.add(new_user)
+        db.session.commit()
+
+        login_user(new_user)
+        return redirect(url_for('views.index'))
+    return render_template('user.html', form=register_form, heading='Register')
+
+# this is the logout function
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('views.index'))
