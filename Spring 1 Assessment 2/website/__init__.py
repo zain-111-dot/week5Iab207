@@ -31,4 +31,8 @@ def create_app():
     from . import auth
     app.register_blueprint(auth.auth_bp)
 
+    # creates any missing tables in the database (User, Event, Comment, Order)
+    with app.app_context():
+        db.create_all()
+
     return app
