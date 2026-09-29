@@ -18,7 +18,7 @@ def login():
     if login_form.validate_on_submit():
         user_name = login_form.user_name.data
         password = login_form.password.data
-        user = db.session.scalar(db.select(User).where(User.name==user_name))
+        user = db.session.scalar(db.select(User).where(User.name == user_name))
         if user is None:
             error = 'Incorrect user name'
         elif not check_password_hash(user.password_hash, password): # takes the hash and cleartext password
@@ -26,7 +26,6 @@ def login():
         if error is None:
             login_user(user)
             nextp = request.args.get('next') # this gives the url from where the login page was accessed
-            print(nextp)
             if nextp is None or not nextp.startswith('/'):
                 return redirect(url_for('views.index'))
             return redirect(nextp)
@@ -43,17 +42,18 @@ def register():
         email = register_form.email.data
         password = register_form.password.data
         password_hash = generate_password_hash(password).decode('utf-8')
-
-        new_user = User(name=user_name,
-                         email=email,
-                         password_hash=password_hash,
-                         first_name=register_form.first_name.data,
-                         surname=register_form.surname.data,
-                         contact_number=register_form.contact_number.data,
-                         street_address=register_form.street_address.data)
+        
+        new_user = User(
+            name=user_name,
+            email=email,
+            password_hash=password_hash,
+            first_name=register_form.first_name.data,
+            surname=register_form.surname.data,
+            contact_number=register_form.contact_number.data,
+            street_address=register_form.street_address.data
+        )
         db.session.add(new_user)
         db.session.commit()
-
         login_user(new_user)
         return redirect(url_for('views.index'))
     return render_template('user.html', form=register_form, heading='Register')
