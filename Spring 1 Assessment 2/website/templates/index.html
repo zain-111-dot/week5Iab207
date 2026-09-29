@@ -121,98 +121,83 @@
                     <h4 class="card-title">
                         {{ event.title }}
                     </h4>
+<!-- Edited by Zain -->
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Gaming Events Hub</h1>
+        <p class="lead">Discover gaming tournaments, competitions and community events.</p>
+    </div>
 
+    <!-- SEARCH SECTION -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form method="GET" action="{{ url_for('views.index') }}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search events by name, description or venue">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- CATEGORY SECTION -->
+    <div class="text-center mb-4">
+        <h4 class="mb-3">Browse by Category</h4>
+        <a href="{{ url_for('views.index') }}" class="btn btn-outline-dark m-1">All Events</a>
+        {% for cat in categories %}
+        <a href="{{ url_for('views.index', category=cat) }}" class="btn {% if selected_category == cat %}btn-primary{% else %}btn-outline-primary{% endif %} m-1">{{ cat }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- EVENT LISTING -->
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <!-- EVENT IMAGE -->
+                {% if event.image_url %}
+                    <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 220px; object-fit: cover;">
+                {% else %}
+                    <img src="{{ url_for('static', filename='img/sample_event.jpg') }}" class="card-img-top" alt="Gaming event" style="height: 220px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <!-- EVENT TITLE -->
+                    <h4 class="card-title">{{ event.title }}</h4>
+                    
                     <!-- CATEGORY -->
-                    <p>
-                        <strong>Category:</strong>
-                        {{ event.category }}
-                    </p>
-
-
+                    <p><strong>Category:</strong> {{ event.category }}</p>
+                    
                     <!-- DATE -->
-                    <p>
-                        <strong>Date:</strong>
-                        {{ event.date.strftime('%d %B %Y') }}
-                    </p>
-
-
+                    <p><strong>Date:</strong> {{ event.date.strftime('%d %B %Y') }}</p>
+                    
                     <!-- VENUE -->
-                    <p>
-                        <strong>Venue:</strong>
-                        {{ event.venue }}
-                    </p>
-
-
+                    <p><strong>Venue:</strong> {{ event.venue }}</p>
+                    
                     <!-- STATUS -->
-                    <p>
-                        <strong>Status:</strong>
-
-                        {% if event.status == 'Open' %}
-                            <span class="badge bg-success">
-                                Open
-                            </span>
-
-                        {% elif event.status == 'Sold Out' %}
-                            <span class="badge bg-danger">
-                                Sold Out
-                            </span>
-
-                        {% elif event.status == 'Cancelled' %}
-                            <span class="badge bg-secondary">
-                                Cancelled
-                            </span>
-
-                        {% else %}
-                            <span class="badge bg-warning text-dark">
-                                {{ event.status }}
-                            </span>
-                        {% endif %}
+                    <p><strong>Status:</strong> 
+                        <span class="badge {% if event.status == 'Open' %}bg-success{% elif event.status == 'Sold Out' %}bg-danger{% elif event.status == 'Cancelled' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">{{ event.status }}</span>
                     </p>
-
-
+                    
                     <!-- TICKETS -->
-                    <p>
-                        <strong>Tickets Available:</strong>
-                        {{ event.tickets_available }}
-                    </p>
-
-
+                    <p><strong>Tickets Available:</strong> {{ event.tickets_available }}</p>
+                    
                     <!-- PRICE -->
-                    <p>
-                        <strong>Ticket Price:</strong>
-
-                        {% if event.ticket_price == 0 %}
-                            Free
-                        {% else %}
-                            ${{ "%.2f"|format(event.ticket_price) }}
-                        {% endif %}
-                    </p>
-
-
+                    <p><strong>Ticket Price:</strong> {% if event.ticket_price == 0 %}Free{% else %}${{ "%.2f"|format(event.ticket_price) }}{% endif %}</p>
+                    
                     <!-- DETAILS BUTTON -->
-                    <a
-                        href="{{ url_for('views.event_details', event_id=event.id) }}"
-                        class="btn btn-primary mt-auto"
-                    >
-                        View Event Details
-                    </a>
-
+                    <a href="{{ url_for('views.event_details', event_id=event.id) }}" class="btn btn-primary mt-auto">View Event Details</a>
                 </div>
             </div>
         </div>
-
         {% else %}
-
         <!-- SHOWN WHEN DATABASE HAS NO MATCHING EVENTS -->
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                No events were found.
-            </div>
-        </div>
-
+        <div class="col-12"><div class="alert alert-info text-center">No events were found.</div></div>
         {% endfor %}
-
+    </div>
+</div>
+{% endblock %}
     </div>
 
 </div>
