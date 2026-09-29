@@ -1,0 +1,24 @@
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Bookings</h1>
+    {% if orders %}
+    <table class="table table-hover table-striped">
+        <thead class="table-dark"><tr><th>Order ID</th><th>Event</th><th>Event Date</th><th>Quantity</th><th>Total Price</th><th>Booking Date</th></tr></thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td><a href="{{ url_for('views.event_details', event_id=order.event.id) }}">{{ order.event.title }}</a></td>
+                <td>{{ order.event.date.strftime('%d %b %Y') }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>${{ "%.2f"|format(order.price) }}</td>
+                <td>{{ order.booking_date.strftime('%d %b %Y, %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">You haven't made any bookings yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
