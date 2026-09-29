@@ -1,123 +1,78 @@
-{# Edited by Nulan #}
+<!-- Edited by Nulan -->
 {% extends "base.html" %}
-{% from 'bootstrap5/form.html' import render_form %}
-
+{% from "bootstrap5/form.html" import render_form %}
 {% block content %}
 <div class="container my-4">
-
-  <div class="row g-4">
-
-    <!-- Event image -->
-    <div class="col-md-6">
-      {% if event.image_url and event.image_url.startswith('http') %}
-        <img src="{{ event.image_url }}" class="img-fluid rounded" alt="{{ event.title }}">
-      {% else %}
-        <img src="{{ url_for('static', filename=event.image_url or 'Img/sample_event.jpg') }}" class="img-fluid rounded" alt="{{ event.title }}">
-      {% endif %}
-    </div>
-
-    <!-- Event details -->
-    <div class="col-md-6">
-      <h2>
-        {{ event.title }}
-        {% if event.status == 'Open' %}
-          <span class="badge bg-success">Open</span>
-        {% elif event.status == 'Sold Out' %}
-          <span class="badge bg-warning text-dark">Sold Out</span>
-        {% elif event.status == 'Cancelled' %}
-          <span class="badge bg-danger">Cancelled</span>
-        {% else %}
-          <span class="badge bg-secondary">{{ event.status }}</span>
-        {% endif %}
-      </h2>
-
-      <p><strong>Category:</strong> {{ event.category }}</p>
-      <p><strong>Venue:</strong> {{ event.venue }}</p>
-      <p><strong>Date:</strong> {{ event.date }}</p>
-      <p><strong>Time:</strong> {{ event.start_time }} – {{ event.end_time }}</p>
-      <p><strong>Ticket price:</strong> ${{ '%.2f'|format(event.ticket_price or 0) }}</p>
-      <p><strong>Tickets available:</strong> {{ event.tickets_available }}</p>
-      <p>{{ event.description }}</p>
-
-      <!-- Acknowledgement of Country -->
-      {% if event.acknowledgement == 'generic' %}
-        <div class="alert alert-secondary">
-          <h6 class="alert-heading">Acknowledgement of Country</h6>
-          <p class="mb-0">We acknowledge the Traditional Custodians of the lands on which this event takes place and pay our respects to Elders past and present.</p>
+    <div class="row g-4">
+        <!-- Event image -->
+        <div class="col-md-6">
+            {% if event.image_url %}
+                <img src="{{ event.image_url }}" class="img-fluid rounded" alt="{{ event.title }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/sample_event.jpg') }}" class="img-fluid rounded" alt="{{ event.title }}">
+            {% endif %}
         </div>
-      {% elif event.acknowledgement == 'enhanced' %}
-        <div class="alert alert-secondary">
-          <h6 class="alert-heading">Acknowledgement of Country</h6>
-          <p class="mb-0">{{ event.acknowledgement_text or 'The organiser has included a tailored Acknowledgement of Country for this event.' }}</p>
-        </div>
-      {% endif %}
+        
+        <!-- Event details -->
+        <div class="col-md-6">
+            <h2>{{ event.title }}
+                <span class="badge {% if event.status == 'Open' %}bg-success{% elif event.status == 'Sold Out' %}bg-danger{% elif event.status == 'Cancelled' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">{{ event.status }}</span>
+            </h2>
+            <p><strong>Category:</strong> {{ event.category }}</p>
+            <p><strong>Venue:</strong> {{ event.venue }}</p>
+            <p><strong>Date:</strong> {{ event.date.strftime('%d %B %Y') }}</p>
+            <p><strong>Time:</strong> {{ event.start_time.strftime('%H:%M') }} - {{ event.end_time.strftime('%H:%M') }}</p>
+            <p><strong>Ticket price:</strong> {% if event.ticket_price == 0 %}Free{% else %}${{ "%.2f"|format(event.ticket_price) }}{% endif %}</p>
+            <p><strong>Tickets available:</strong> {{ event.tickets_available }}</p>
+            <p>{{ event.description }}</p>
+            
+            <!-- Acknowledgement of Country -->
+            {% if event.acknowledgement == 'Generic' %}
+            <div class="alert alert-secondary"><h6>Acknowledgement of Country</h6><p class="mb-0">We acknowledge the Traditional Custodians of the lands on which this event takes place.</p></div>
+            {% elif event.acknowledgement == 'Enhanced' %}
+            <div class="alert alert-secondary"><h6>Acknowledgement of Country</h6><p class="mb-0">The organiser has included a tailored Acknowledgement of Country for this event.</p></div>
+            {% endif %}
 
-      <!-- Edit / Cancel: only the person who created the event sees these -->
-      {% if current_user.is_authenticated and current_user.id == event.creator_id %}
-        <div class="mb-3">
-          <a href="{{ url_for('views.edit_event', event_id=event.id) }}" class="btn btn-outline-primary btn-sm">Edit Event</a>
-          {% if event.status not in ['Cancelled', 'Inactive'] %}
-            <form method="post" action="{{ url_for('views.cancel_event', event_id=event.id) }}" class="d-inline">
-              <button type="submit" class="btn btn-outline-danger btn-sm">Cancel Event</button>
-            </form>
-          {% endif %}
-        </div>
-      {% endif %}
-
-      <hr>
-      <h4>Book Tickets</h4>
-      {% if event.status != 'Open' %}
-        <div class="alert alert-info">Booking is closed. This event is {{ event.status }}.</div>
-      {% elif current_user.is_authenticated %}
-        {{ render_form(booking_form, action=url_for('views.book_event', event_id=event.id), button_map={'submit': 'primary'}) }}
-      {% else %}
-        <div class="alert alert-info">
-          Please <a href="{{ url_for('auth.login', next=request.path) }}">log in</a>
-          or <a href="{{ url_for('auth.register') }}">register</a> to book tickets.
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Comments -->
-  <hr class="my-4">
-  <h4>Comments ({{ comments|length }})</h4>
-  {% for comment in comments %}
-    <div class="border p-2 mb-2 rounded">
-      <strong>{{ comment.user.name }}</strong>
-      <span class="text-muted">{{ comment.date_posted.strftime('%d %b %Y, %H:%M') if comment.date_posted }}</span>
-      <p class="mb-0">{{ comment.text }}</p>
-    </div>
-  {% else %}
-    <p class="text-muted">No comments yet. Be the first to comment.</p>
-  {% endfor %}
-
-  {% if current_user.is_authenticated %}
-    {{ render_form(comment_form, action=url_for('views.add_comment', event_id=event.id), button_map={'submit': 'secondary'}) }}
-  {% else %}
-    <div class="alert alert-info">
-      Please <a href="{{ url_for('auth.login', next=request.path) }}">log in</a> to post a comment.
-    </div>
-  {% endif %}
-
-  <!-- AI feature: only shows if the view passes related_events -->
-  {% if related_events %}
-    <hr class="my-4">
-    <h4>You might also like</h4>
-    <div class="row g-3">
-      {% for other in related_events %}
-        <div class="col-md-4">
-          <div class="card h-100">
-            <div class="card-body">
-              <h6 class="card-title">{{ other.title }}</h6>
-              <p class="card-text text-muted">{{ other.category }} · {{ other.date }}</p>
-              <a href="{{ url_for('views.event_detail', event_id=other.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+            <!-- Edit / Cancel: only the person who created the event sees these -->
+            {% if current_user.is_authenticated and current_user.id == event.creator_id %}
+            <div class="mb-3">
+                <a href="{{ url_for('views.edit_event', event_id=event.id) }}" class="btn btn-outline-primary btn-sm">Edit Event</a>
+                {% if event.status not in ['Cancelled', 'Inactive'] %}
+                <form method="post" action="{{ url_for('views.cancel_event', event_id=event.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cancel Event</button>
+                </form>
+                {% endif %}
             </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+            {% endif %}
 
+            <hr>
+            <h4>Book Tickets</h4>
+            {% if event.status != 'Open' %}
+                <div class="alert alert-info">Booking is closed. This event is {{ event.status }}.</div>
+            {% elif current_user.is_authenticated %}
+                {{ render_form(booking_form, action=url_for('views.book_event', event_id=event.id), button_map={'submit': 'primary'}) }}
+            {% else %}
+                <div class="alert alert-info">Please <a href="{{ url_for('auth.login', next=request.path) }}">log in</a> or <a href="{{ url_for('auth.register') }}">register</a> to book tickets.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Comments -->
+    <hr class="my-4">
+    <h4>Comments ({{ comments|length }})</h4>
+    {% for comment in comments %}
+    <div class="border p-2 mb-2 rounded">
+        <strong>{{ comment.user.name }}</strong> <span class="text-muted">{{ comment.date_posted.strftime('%d %b %Y, %H:%M') }}</span>
+        <p class="mb-0">{{ comment.text }}</p>
+    </div>
+    {% else %}
+    <p class="text-muted">No comments yet. Be the first to comment.</p>
+    {% endfor %}
+
+    {% if current_user.is_authenticated %}
+        {{ render_form(comment_form, action=url_for('views.add_comment', event_id=event.id), button_map={'submit': 'secondary'}) }}
+    {% else %}
+        <div class="alert alert-info">Please <a href="{{ url_for('auth.login', next=request.path) }}">log in</a> to post a comment.</div>
+    {% endif %}
 </div>
 {% endblock %}
