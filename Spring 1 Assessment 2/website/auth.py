@@ -40,6 +40,20 @@ def register():
     if register_form.validate_on_submit():
         user_name = register_form.user_name.data
         email = register_form.email.data
+        
+        # Check if username or email already exists
+        existing_user = db.session.scalar(db.select(User).where(
+            (User.name == user_name) | (User.email == email)
+        ))
+        
+        if existing_user:
+            if existing_user.name == user_name:
+                flash('Username already taken. Please choose another one.', 'danger')
+            else:
+                flash('Email already registered. Please login or use another email.', 'danger')
+            return render_template('user.html', form=register_form, heading='Register')
+        
+        # If no existing user, proceed with creating the account
         password = register_form.password.data
         password_hash = generate_password_hash(password).decode('utf-8')
         
@@ -56,6 +70,7 @@ def register():
         db.session.commit()
         login_user(new_user)
         return redirect(url_for('views.index'))
+        
     return render_template('user.html', form=register_form, heading='Register')
 
 # this is the logout function
