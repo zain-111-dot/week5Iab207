@@ -3,7 +3,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-# from flask import render_template
+from flask import render_template # Test for 404 and 500 error pages
 import os
 
 db = SQLAlchemy()
@@ -37,19 +37,17 @@ def create_app():
     from . import auth
     app.register_blueprint(auth.auth_bp)
 
-    # @app.errorhandler(404)
-    # def not_found_error(error):
-    #    return render_template('404.html'), 404
+    # Test for 404 and 500 error pages
+    @app.errorhandler(404)
+    def not_found_error(error):
+       return render_template('404.html'), 404
 
-    # @app.errorhandler(500)
-    # def internal_error(error):
-    # db.session.rollback()
-    # return render_template('500.html'), 500
+    @app.errorhandler(500)
+    def internal_error(error):
+        db.session.rollback()
+        return render_template('500.html'), 500
 
     with app.app_context():
-        db.create_all()
-
-    return app
         db.create_all()
 
     return app
