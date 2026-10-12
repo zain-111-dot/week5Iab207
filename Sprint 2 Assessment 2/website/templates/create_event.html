@@ -1,16 +1,63 @@
 {% extends "base.html" %}
-{% from "bootstrap5/form.html" import render_form %}
+
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">{% if event %}Edit Event{% else %}Create New Event{% endif %}</h4>
-                </div>
-                <div class="card-body">
-                    {{ render_form(form, action=url_for('views.create_event') if not event else url_for('views.edit_event', event_id=event.id)) }}
-                </div>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Create New Event</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.csrf_token }}
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", rows="4") }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date(class="form-control", type="datetime-local") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.location.label(class="form-label") }}
+                            {{ form.location(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.price.label(class="form-label") }}
+                            {{ form.price(class="form-control", step="0.01") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.total_tickets.label(class="form-label") }}
+                            {{ form.total_tickets(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.image_url.label(class="form-label") }}
+                        {{ form.image_url(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.categories.label(class="form-label") }}
+                        {{ form.categories(class="form-control", placeholder="e.g. FPS, MOBA, RPG") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.acknowledgement_type.label(class="form-label") }}
+                        {{ form.acknowledgement_type(class="form-select") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.acknowledgement_text.label(class="form-label") }}
+                        {{ form.acknowledgement_text(class="form-control", rows="3") }}
+                    </div>
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
             </div>
         </div>
     </div>
