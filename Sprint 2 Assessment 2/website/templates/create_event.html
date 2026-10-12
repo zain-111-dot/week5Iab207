@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{% if event %}Edit Event{% else %}Create New Event{% endif %}</h4>
+                </div>
+                <div class="card-body">
+                    {{ render_form(form, action=url_for('views.create_event') if not event else url_for('views.edit_event', event_id=event.id)) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
