@@ -1,35 +1,80 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>My Events</h1>
-        <a href="{{ url_for('views.create_event') }}" class="btn btn-primary">Create New Event</a>
+        <a href="{{ url_for('main.create_event') }}" class="btn btn-primary">Create New Event</a>
     </div>
+
     {% if events %}
-    <table class="table table-hover table-striped align-middle">
-        <thead class="table-dark"><tr><th>Title</th><th>Date</th><th>Venue</th><th>Status</th><th>Tickets Left</th><th>Actions</th></tr></thead>
-        <tbody>
-            {% for event in events %}
-            <tr>
-                <td><a href="{{ url_for('views.event_details', event_id=event.id) }}">{{ event.title }}</a></td>
-                <td>{{ event.date.strftime('%d %b %Y') }}</td>
-                <td>{{ event.venue }}</td>
-                <td><span class="badge {% if event.status == 'Open' %}bg-success{% elif event.status == 'Sold Out' %}bg-danger{% elif event.status == 'Cancelled' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">{{ event.status }}</span></td>
-                <td>{{ event.tickets_available }}</td>
-                <td>
-                    <a href="{{ url_for('views.edit_event', event_id=event.id) }}" class="btn btn-sm btn-warning">Edit</a>
-                    {% if event.status != 'Cancelled' %}
-                    <form method="POST" action="{{ url_for('views.cancel_event', event_id=event.id) }}" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Tickets Left</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td><a href="{{ url_for('main.event_detail', event_id=event.id) }}">{{ event.title }}</a></td>
+                    <td>{{ event.date.strftime('%d %b %Y') }}</td>
+                    <td>{{ event.location }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if event.status == 'Open' %}bg-success
+                            {% elif event.status == 'Sold Out' %}bg-danger
+                            {% elif event.status == 'Inactive' %}bg-secondary
+                            {% elif event.status == 'Cancelled' %}bg-dark
+                            {% endif %}">
+                            {{ event.status }}
+                        </span>
+                    </td>
+                    <td>{{ event.available_tickets }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('main.edit_event', event_id=event.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            {% if event.status != 'Cancelled' %}
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ event.id }}">
+                                Cancel
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="modal fade" id="cancelModal{{ event.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Cancel Event</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to cancel "{{ event.title }}"?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <form method="POST" action="{{ url_for('main.cancel_event', event_id=event.id) }}">
+                                            <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <div class="alert alert-info">You haven't created any events yet.</div>
+    <div class="alert alert-info">
+        You haven't created any events yet.
+    </div>
     {% endif %}
 </div>
 {% endblock %}
