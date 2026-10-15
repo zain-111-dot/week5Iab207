@@ -56,6 +56,35 @@ class Event(db.Model):
     creator = db.relationship('User', back_populates='events')
     comments = db.relationship('Comment', back_populates='event', cascade='all, delete-orphan')
     bookings = db.relationship('Order', back_populates='event', cascade='all, delete-orphan')
+    creator = db.relationship(
+        'User',
+        back_populates='events'
+    )
+
+    comments = db.relationship(
+        'Comment',
+        back_populates='event',
+        cascade='all, delete-orphan'
+    )
+
+    bookings = db.relationship(
+        'Order',
+        back_populates='event',
+        cascade='all, delete-orphan'
+    )
+
+    def update_status(self):
+        if self.status == 'Cancelled':
+            return
+
+        if self.date < datetime.today().date():
+            self.status = 'Inactive'
+        elif self.tickets_available <= 0:
+            self.status = 'Sold Out'
+        else:
+            self.status = 'Open'
+
+
 
 # COMMENT TABLE
 class Comment(db.Model):

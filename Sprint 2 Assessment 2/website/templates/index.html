@@ -10,7 +10,7 @@
     <!-- SEARCH SECTION -->
     <div class="row justify-content-center mb-4">
         <div class="col-md-8">
-            <form method="GET" action="{{ url_for('views.index') }}">
+            <form method="GET" action="{{ url_for('views.search_results') }}"></form>
                 <div class="input-group">
                     <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Search events by name, description or venue">
                     <button class="btn btn-primary" type="submit">Search</button>

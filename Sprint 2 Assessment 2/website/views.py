@@ -1,48 +1,33 @@
 # Edited by Zain
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from sqlalchemy import or_
 from flask_login import current_user, login_required
+
 from . import db
-from .models import Event, Category, Order, Comment
+from .models import Event, Order, Comment
 from .forms import EventForm, BookingForm, CommentForm
-from datetime import datetime
+
+# Event controller functions
+from .event_controller import get_events, get_categories, get_event, semantic_search
+
 
 # Main website routes
 main_bp = Blueprint('views', __name__)
 
-# TASK #11 - LANDING PAGE AND EVENT LISTING
+
+# LANDING PAGE AND EVENT LISTING
 @main_bp.route('/')
 def index():
-    # Get optional search and category values
     search = request.args.get('search', '').strip()
     category = request.args.get('category', '').strip()
-    
-    # Start with all events
-    statement = db.select(Event)
-    
-    # Filter by category
-    if category:
-        statement = statement.where(Event.category == category)
-        
-    # Keyword search
-    if search:
-        search_pattern = f'%{search}%'
-        statement = statement.where(or_(
-            Event.title.ilike(search_pattern),
-            Event.description.ilike(search_pattern),
-            Event.venue.ilike(search_pattern)
-        ))
-        
-    # Sort events by date and start time
-    statement = statement.order_by(Event.date.asc(), Event.start_time.asc())
-    
-    # Get events from database
-    events = db.session.scalars(statement).all()
-    
-    # Get all available categories
-    category_statement = db.select(Event.category).distinct().order_by(Event.category)
-    categories = db.session.scalars(category_statement).all()
-    
+
+    events = get_events(
+        search=search,
+        category=category
+    )
+
+    categories = get_categories()
+
     return render_template(
         'index.html',
         events=events,
@@ -51,12 +36,19 @@ def index():
         search=search
     )
 
-# TASK #12 - EVENT DETAILS PAGE
+
+# EVENT DETAILS PAGE
 @main_bp.route('/event/<int:event_id>')
 def event_details(event_id):
-    # Find one event using its database ID
-    event = db.get_or_404(Event, event_id)
-    comments = Comment.query.filter_by(event_id=event_id).order_by(Comment.date_posted.desc()).all()
+    event = get_event(event_id)
+
+    comments = (
+        Comment.query
+        .filter_by(event_id=event_id)
+        .order_by(Comment.date_posted.desc())
+        .all()
+    )
+
     return render_template(
         'event_detail.html',
         event=event,
@@ -188,6 +180,21 @@ def history():
 def acknowledgement():
     return render_template('acknowledgement.html')
 
+
+# SEARCH RESULTS PAGE
+@main_bp.route('/search')
+def search_results():
+    query = request.args.get('search', '').strip()
+
+    traditional_results = get_events(search=query)
+    ai_results = semantic_search(query)
+
+    return render_template(
+        'search_results.html',
+        query=query,
+        traditional_results=traditional_results,
+        ai_results=ai_results
+    )
 
 # TO TEST 500 ERROR PAGE
 @main_bp.route('/test-500')
