@@ -48,6 +48,9 @@ class Event(db.Model):
     # None, Generic or Enhanced
     acknowledgement = db.Column(db.String(20), nullable=False, default='None')
     
+    # The creator's own Acknowledgement of Country wording (used when Enhanced is chosen)
+    acknowledgement_text = db.Column(db.String(500), nullable=True)
+    
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     creator = db.relationship('User', back_populates='events')
