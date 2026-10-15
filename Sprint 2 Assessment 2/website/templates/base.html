@@ -34,6 +34,9 @@
                     <a class="nav-link {% if request.endpoint == 'views.history' %}active fw-semibold{% endif %}" href="{{ url_for('views.history') }}">My Bookings</a>
                 </li>
                 {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'views.acknowledgement' %}active fw-semibold{% endif %}" href="{{ url_for('views.acknowledgement') }}">Acknowledgement</a>
+                </li>
             </ul>
 
             <!-- Search box (sends the word to the home page search) -->
@@ -93,14 +96,14 @@
     <div class="container">
         <div class="row g-4">
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h5 class="fw-bold">🎮 Gaming Events Hub</h5>
                 <p class="text-secondary small">
                     Discover, book and host gaming events near you. From FPS tournaments to RPG nights, find your next game and your next team.
                 </p>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h6 class="text-uppercase text-secondary">Quick Links</h6>
                 <ul class="list-unstyled">
                     <li><a href="{{ url_for('views.index') }}" class="text-light text-decoration-none">Browse Events</a></li>
@@ -112,13 +115,6 @@
                     <li><a href="{{ url_for('auth.register') }}" class="text-light text-decoration-none">Register</a></li>
                     {% endif %}
                 </ul>
-            </div>
-
-            <div class="col-md-4">
-                <h6 class="text-uppercase text-secondary">Acknowledgement of Country</h6>
-                <p class="text-secondary small">
-                    We acknowledge the Traditional Custodians of the lands on which we live, work and play, and pay our respects to Elders past and present.
-                </p>
             </div>
         </div>
 
