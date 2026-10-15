@@ -83,6 +83,7 @@ def create_event():
             ticket_price=form.ticket_price.data,
             tickets_available=form.tickets_available.data,
             acknowledgement=form.acknowledgement.data,
+            acknowledgement_text=form.acknowledgement_text.data,
             creator_id=current_user.id,
             status='Open'
         )
@@ -114,6 +115,7 @@ def edit_event(event_id):
         event.ticket_price = form.ticket_price.data
         event.tickets_available = form.tickets_available.data
         event.acknowledgement = form.acknowledgement.data
+        event.acknowledgement_text = form.acknowledgement_text.data
         db.session.commit()
         flash('Event updated successfully!', 'success')
         return redirect(url_for('views.event_details', event_id=event.id))
@@ -181,8 +183,13 @@ def history():
     orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.booking_date.desc()).all()
     return render_template('history.html', orders=orders)
 
+# Acknowledgement of Country page
+@main_bp.route('/acknowledgement')
+def acknowledgement():
+    return render_template('acknowledgement.html')
+
 
 # TO TEST 500 ERROR PAGE
 @main_bp.route('/test-500')
 def test_500():
-    return 1 / 0 
+    return 1 / 0
