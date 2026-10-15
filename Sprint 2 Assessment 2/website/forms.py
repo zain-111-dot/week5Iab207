@@ -1,7 +1,7 @@
 # edited by paolo
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField, PasswordField, SubmitField, TextAreaField, IntegerField, FloatField, SelectField, DateField, TimeField
-from wtforms.validators import InputRequired, Email, EqualTo, NumberRange, Optional
+from wtforms.validators import InputRequired, Email, EqualTo, NumberRange, Optional, Length
 
 # creates the login information
 class LoginForm(FlaskForm):
@@ -38,6 +38,7 @@ class EventForm(FlaskForm):
     ticket_price = FloatField("Ticket Price", validators=[InputRequired(), NumberRange(min=0)])
     tickets_available = IntegerField("Tickets Available", validators=[InputRequired(), NumberRange(min=1)])
     acknowledgement = SelectField("Acknowledgement of Country", choices=[('None', 'None'), ('Generic', 'Generic'), ('Enhanced', 'Enhanced')], validators=[InputRequired()])
+    acknowledgement_text = TextAreaField("Enhanced Acknowledgement of Country (optional)", validators=[Optional(), Length(max=500)])
     submit = SubmitField("Create Event")
 
 # Booking Form
