@@ -6,6 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Gaming Events Hub{% endblock %}</title>
     {{ bootstrap.load_css() }}
+
+    <style>
+        /* Edited by Nulan - colour theme */
+        :root {
+            --hub-purple: #6d28d9;
+            --hub-indigo: #4338ca;
+            --hub-blue: #2563eb;
+            --hub-pink: #db2777;
+            --hub-cyan: #0891b2;
+        }
+
+        /* Soft colourful page background */
+        body {
+            background: linear-gradient(180deg, #eef2ff 0%, #f5f3ff 45%, #fdf2f8 100%) !important;
+            background-attachment: fixed !important;
+        }
+
+        /* Gradient navbar and footer */
+        nav.navbar {
+            background: linear-gradient(90deg, #1e1b4b 0%, var(--hub-indigo) 50%, var(--hub-purple) 100%) !important;
+            border-bottom: 3px solid var(--hub-pink);
+        }
+        footer.bg-dark {
+            background: linear-gradient(90deg, #1e1b4b 0%, var(--hub-indigo) 55%, var(--hub-purple) 100%) !important;
+            border-top: 3px solid var(--hub-pink);
+        }
+        footer .text-secondary { color: #c7d2fe !important; }
+        .navbar-nav .nav-link.active { color: #fff !important; border-bottom: 2px solid var(--hub-pink); }
+        .navbar-nav .nav-link:hover { color: #fbcfe8 !important; }
+
+        /* Big page headings get a gradient colour */
+        main h1 {
+            background: linear-gradient(90deg, var(--hub-indigo), var(--hub-purple), var(--hub-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--hub-purple);
+            font-weight: 800;
+        }
+        main h2, main h4 { color: #312e81; }
+
+        /* Event cards: rounded, shadow, lift on hover, coloured top edge */
+        .card {
+            border: 0 !important;
+            border-top: 5px solid var(--hub-purple) !important;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(67, 56, 202, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 28px rgba(109, 40, 217, 0.28);
+        }
+        .card .card-img-top { transition: transform 0.3s ease; }
+        .card:hover .card-img-top { transform: scale(1.04); }
+
+        /* Colourful buttons */
+        .btn-primary {
+            background: linear-gradient(90deg, var(--hub-blue), var(--hub-purple)) !important;
+            border: 0 !important;
+        }
+        .btn-primary:hover { filter: brightness(1.12); }
+        .btn-outline-primary {
+            color: var(--hub-purple) !important;
+            border-color: var(--hub-purple) !important;
+        }
+        .btn-outline-primary:hover, .btn-check:checked + .btn-outline-primary {
+            background: var(--hub-purple) !important;
+            color: #fff !important;
+        }
+        .btn-outline-dark:hover { background: var(--hub-pink) !important; border-color: var(--hub-pink) !important; color: #fff !important; }
+
+        /* Status badges and form inputs */
+        .badge { border-radius: 999px; padding: 0.45em 0.8em; letter-spacing: 0.3px; }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--hub-purple);
+            box-shadow: 0 0 0 0.2rem rgba(109, 40, 217, 0.2);
+        }
+
+        /* Alerts and Acknowledgement box */
+        .alert-secondary { background: #ede9fe; border-color: #c4b5fd; color: #3b0764; }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 
