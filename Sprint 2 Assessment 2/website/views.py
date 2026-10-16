@@ -10,9 +10,28 @@ from datetime import datetime
 # Main website routes
 main_bp = Blueprint('views', __name__)
 
+# Helper function to automatically update expired events
+def update_expired_events():
+    now = datetime.now()
+    # Get all events that are currently 'Open'
+    open_events = Event.query.filter_by(status='Open').all()
+    updated = False
+    
+    for event in open_events:
+        # Combine the event's date and start_time to compare with right now
+        event_datetime = datetime.combine(event.date, event.start_time)
+        if event_datetime < now:
+            event.status = 'Inactive'
+            updated = True
+            
+    if updated:
+        db.session.commit()
+
 # TASK #11 - LANDING PAGE AND EVENT LISTING
 @main_bp.route('/')
 def index():
+    update_expired_events()  # 👈 Automatically update statuses before showing events
+    
     # Get optional search and category values
     search = request.args.get('search', '').strip()
     category = request.args.get('category', '').strip()
@@ -43,27 +62,15 @@ def index():
     category_statement = db.select(Event.category).distinct().order_by(Event.category)
     categories = db.session.scalars(category_statement).all()
     
-    return render_template(
-        'index.html',
-        events=events,
-        categories=categories,
-        selected_category=category,
-        search=search
-    )
+    return render_template('index.html', events=events, categories=categories, selected_category=category, search=search)
 
 # TASK #12 - EVENT DETAILS PAGE
 @main_bp.route('/event/<int:event_id>')
 def event_details(event_id):
-    # Find one event using its database ID
+    update_expired_events()  # 👈 Also check here in case they navigate directly
     event = db.get_or_404(Event, event_id)
     comments = Comment.query.filter_by(event_id=event_id).order_by(Comment.date_posted.desc()).all()
-    return render_template(
-        'event_detail.html',
-        event=event,
-        booking_form=BookingForm(),
-        comment_form=CommentForm(),
-        comments=comments
-    )
+    return render_template('event_detail.html', event=event, booking_form=BookingForm(), comment_form=CommentForm(), comments=comments)
 
 # Create Event page (Moved to Sprint 1)
 @main_bp.route('/create-event', methods=['GET', 'POST'])
@@ -138,6 +145,7 @@ def cancel_event(event_id):
 @main_bp.route('/my-events')
 @login_required
 def my_events():
+    update_expired_events()  # 👈 Update statuses here too
     events = Event.query.filter_by(creator_id=current_user.id).order_by(Event.date.desc()).all()
     return render_template('my_events.html', events=events)
 
@@ -187,7 +195,6 @@ def history():
 @main_bp.route('/acknowledgement')
 def acknowledgement():
     return render_template('acknowledgement.html')
-
 
 # TO TEST 500 ERROR PAGE
 # @main_bp.route('/test-500')
