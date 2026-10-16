@@ -1,6 +1,6 @@
 from website import create_app, db
 from website.models import User, Event, Category, Order, Comment
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from flask_bcrypt import generate_password_hash
 
 app = create_app()
@@ -32,22 +32,22 @@ with app.app_context():
     db.session.add_all([user1, user2])
     db.session.commit()
 
-    # Create Events
+    # Create Events (Fixed times)
     event1 = Event(
         title='FPS Tournament', description='A competitive first-person shooter tournament. Bring your best aim!',
-        date=datetime.now() + timedelta(days=30), start_time=datetime.now().time(), end_time=(datetime.now() + timedelta(hours=4)).time(),
+        date=datetime.now().date() + timedelta(days=30), start_time=time(18, 0), end_time=time(22, 0),
         venue='Online', image_url='/static/img/fps.jpg', ticket_price=20.00, tickets_available=100,
         status='Open', acknowledgement='None', creator_id=user1.id, category='FPS'
     )
     event2 = Event(
         title='MOBA Cup', description='Team up with your squad for the ultimate MOBA championship.',
-        date=datetime.now() + timedelta(days=15), start_time=datetime.now().time(), end_time=(datetime.now() + timedelta(hours=3)).time(),
+        date=datetime.now().date() + timedelta(days=15), start_time=time(19, 30), end_time=time(22, 30),
         venue='Online', image_url='/static/img/moba.jpg', ticket_price=15.00, tickets_available=50,
         status='Open', acknowledgement='None', creator_id=user1.id, category='MOBA'
     )
     event3 = Event(
         title='RPG Night', description='A night of epic role-playing adventures. Join a party!',
-        date=datetime.now() + timedelta(days=7), start_time=datetime.now().time(), end_time=(datetime.now() + timedelta(hours=5)).time(),
+        date=datetime.now().date() + timedelta(days=7), start_time=time(17, 0), end_time=time(23, 0),
         venue='Sydney Game Center', image_url='/static/img/rpg.jpg', ticket_price=10.00, tickets_available=200,
         status='Open', acknowledgement='None', creator_id=user2.id, category='RPG'
     )
