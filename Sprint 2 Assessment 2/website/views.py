@@ -190,6 +190,6 @@ def acknowledgement():
 
 
 # TO TEST 500 ERROR PAGE
-@main_bp.route('/test-500')
-def test_500():
-    return 1 / 0
+# @main_bp.route('/test-500')
+# def test_500():
+#     return 1 / 0
