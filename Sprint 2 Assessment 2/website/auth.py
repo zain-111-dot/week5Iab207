@@ -1,10 +1,9 @@
 # edited by paolo
 from flask import Blueprint, flash, render_template, request, url_for, redirect
-from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user
 from .models import User
 from .forms import LoginForm, RegisterForm
-from . import db
+from . import db, bcrypt  # 👈 Import bcrypt instance
 
 # Create a blueprint - make sure all BPs have unique names
 auth_bp = Blueprint('auth', __name__)
@@ -21,11 +20,11 @@ def login():
         user = db.session.scalar(db.select(User).where(User.name == user_name))
         if user is None:
             error = 'Incorrect user name'
-        elif not check_password_hash(user.password_hash, password): # takes the hash and cleartext password
+        elif not bcrypt.check_password_hash(user.password_hash, password): # 👈 Use bcrypt instance
             error = 'Incorrect password'
         if error is None:
             login_user(user)
-            nextp = request.args.get('next') # this gives the url from where the login page was accessed
+            nextp = request.args.get('next')
             if nextp is None or not nextp.startswith('/'):
                 return redirect(url_for('views.index'))
             return redirect(nextp)
@@ -52,10 +51,10 @@ def register():
             else:
                 flash('Email already registered. Please login or use another email.', 'danger')
             return render_template('user.html', form=register_form, heading='Register')
-        
+            
         # If no existing user, proceed with creating the account
         password = register_form.password.data
-        password_hash = generate_password_hash(password).decode('utf-8')
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8') # 👈 Use bcrypt instance
         
         new_user = User(
             name=user_name,
