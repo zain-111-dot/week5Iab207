@@ -1,17 +1,17 @@
 # Edited by Nulan
-from flask import Flask
+from flask import Flask, render_template
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask import render_template 
+from flask_bcrypt import Bcrypt  # 👈 1. ADD THIS IMPORT
 import os
 
 db = SQLAlchemy()
+bcrypt = Bcrypt()  # 👈 2. CREATE THE BCRYPT OBJECT
 
 def create_app():
     app = Flask(__name__)
-    app.debug = False # This one is Testing for 404 and 500 error pages
-    # app.debug = True
+    app.debug = True
     app.secret_key = 'somesecretkey'
 
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -19,6 +19,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
+    bcrypt.init_app(app)  # 👈 3. INITIALIZE BCRYPT WITH THE APP
     Bootstrap5(app)
 
     login_manager = LoginManager()
@@ -40,7 +41,7 @@ def create_app():
     # Test for 404 and 500 error pages
     @app.errorhandler(404)
     def not_found_error(error):
-       return render_template('404.html'), 404
+        return render_template('404.html'), 404
 
     @app.errorhandler(500)
     def internal_error(error):
