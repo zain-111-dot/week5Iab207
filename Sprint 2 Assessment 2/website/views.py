@@ -5,72 +5,49 @@ from flask_login import current_user, login_required
 from . import db
 from .models import Event, Category, Order, Comment
 from .forms import EventForm, BookingForm, CommentForm
+from .event_controller import get_events, get_categories, get_event, semantic_search
 from datetime import datetime
 
 # Main website routes
 main_bp = Blueprint('views', __name__)
 
-# Helper function to automatically update expired events
-def update_expired_events():
-    now = datetime.now()
-    # Get all events that are currently 'Open'
-    open_events = Event.query.filter_by(status='Open').all()
-    updated = False
-    
-    for event in open_events:
-        # Combine the event's date and start_time to compare with right now
-        event_datetime = datetime.combine(event.date, event.start_time)
-        if event_datetime < now:
-            event.status = 'Inactive'
-            updated = True
-            
-    if updated:
-        db.session.commit()
-
 # TASK #11 - LANDING PAGE AND EVENT LISTING
 @main_bp.route('/')
 def index():
-    update_expired_events()  # 👈 Automatically update statuses before showing events
-    
-    # Get optional search and category values
     search = request.args.get('search', '').strip()
     category = request.args.get('category', '').strip()
-    
-    # Start with all events
-    statement = db.select(Event)
-    
-    # Filter by category
-    if category:
-        statement = statement.where(Event.category == category)
-        
-    # Keyword search
-    if search:
-        search_pattern = f'%{search}%'
-        statement = statement.where(or_(
-            Event.title.ilike(search_pattern),
-            Event.description.ilike(search_pattern),
-            Event.venue.ilike(search_pattern)
-        ))
-        
-    # Sort events by date and start time
-    statement = statement.order_by(Event.date.asc(), Event.start_time.asc())
-    
-    # Get events from database
-    events = db.session.scalars(statement).all()
-    
-    # Get all available categories
-    category_statement = db.select(Event.category).distinct().order_by(Event.category)
-    categories = db.session.scalars(category_statement).all()
-    
-    return render_template('index.html', events=events, categories=categories, selected_category=category, search=search)
+
+    events = get_events(search=search, category=category)
+    categories = get_categories()
+
+    for event in events:
+        event.update_status()
+
+    db.session.commit()
+
+    return render_template(
+        'index.html',
+        events=events,
+        categories=categories,
+        selected_category=category,
+        search=search
+    )
 
 # TASK #12 - EVENT DETAILS PAGE
 @main_bp.route('/event/<int:event_id>')
 def event_details(event_id):
-    update_expired_events()  # 👈 Also check here in case they navigate directly
+    # Find one event using its database ID
     event = db.get_or_404(Event, event_id)
+    event.update_status()
+    db.session.commit()
     comments = Comment.query.filter_by(event_id=event_id).order_by(Comment.date_posted.desc()).all()
-    return render_template('event_detail.html', event=event, booking_form=BookingForm(), comment_form=CommentForm(), comments=comments)
+    return render_template(
+        'event_detail.html',
+        event=event,
+        booking_form=BookingForm(),
+        comment_form=CommentForm(),
+        comments=comments
+    )
 
 # Create Event page (Moved to Sprint 1)
 @main_bp.route('/create-event', methods=['GET', 'POST'])
@@ -145,7 +122,6 @@ def cancel_event(event_id):
 @main_bp.route('/my-events')
 @login_required
 def my_events():
-    update_expired_events()  # 👈 Update statuses here too
     events = Event.query.filter_by(creator_id=current_user.id).order_by(Event.date.desc()).all()
     return render_template('my_events.html', events=events)
 
@@ -195,8 +171,23 @@ def history():
 @main_bp.route('/acknowledgement')
 def acknowledgement():
     return render_template('acknowledgement.html')
+# SEARCH RESULTS PAGE
+@main_bp.route('/search')
+def search_results():
+    query = request.args.get('search', '').strip()
+
+    traditional_results = get_events(search=query)
+    ai_results = semantic_search(query)
+
+    return render_template(
+        'search_results.html',
+        search_query=query,
+        traditional_results=traditional_results,
+        ai_results=ai_results
+    )
+
 
 # TO TEST 500 ERROR PAGE
-# @main_bp.route('/test-500')
-# def test_500():
-#     return 1 / 0
+@main_bp.route('/test-500')
+def test_500():
+    return 1 / 0

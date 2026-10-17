@@ -12,10 +12,10 @@
                 {% if event.image_url.startswith('http') or event.image_url.startswith('/') %}
                     <img src="{{ event.image_url }}" class="img-fluid rounded" alt="{{ event.title }}">
                 {% else %}
-                    <img src="{{ url_for('static', filename='Img/' ~ event.image_url) }}" class="img-fluid rounded" alt="{{ event.title }}">
+                    <img src="{{ url_for('static', filename='img/' ~ event.image_url) }}" class="img-fluid rounded" alt="{{ event.title }}">
                 {% endif %}
             {% else %}
-                <img src="{{ url_for('static', filename='Img/sample_event.jpg') }}" class="img-fluid rounded" alt="{{ event.title }}">
+                <img src="{{ url_for('static', filename='img/sample_event.jpg') }}" class="img-fluid rounded" alt="{{ event.title }}">
             {% endif %}
         </div>
 
