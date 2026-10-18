@@ -1,11 +1,11 @@
 # Edited by Zain
 
 from sqlalchemy import or_
-
+from sentence_transformers import SentenceTransformer, util
 from . import db
 from .models import Event
 
-
+semantic_model = SentenceTransformer('all-MiniLM-L6-v2')
 def get_events(search='', category=''):
     """Retrieve events using optional keyword and category filters."""
 
@@ -53,53 +53,51 @@ def get_event(event_id):
 
 
 def semantic_search(query):
-    """Find events using related gaming concepts as well as exact words."""
-
-    query = (query or '').strip().lower()
+    query = (query or '').strip()
 
     if not query:
         return []
 
     events = db.session.scalars(db.select(Event)).all()
 
-    related_words = {
-        'strategy': ['moba', 'rpg', 'team', 'championship'],
-        'team': ['moba', 'fps', 'squad', 'competition'],
-        'shooter': ['fps', 'shooting', 'tournament'],
-        'combat': ['fighting', 'fps', 'battle'],
-        'role': ['rpg', 'adventure', 'role-playing'],
-        'competitive': ['competition', 'tournament', 'fps', 'moba'],
-        'tournament': ['competition', 'championship', 'fps', 'moba'],
-    }
+    if not events:
+        return []
 
-    search_words = query.split()
-    expanded_words = set(search_words)
+    event_texts = [
+        f"{event.title or ''} "
+        f"{event.category or ''} "
+        f"{event.description or ''} "
+        f"{event.venue or ''}"
+        for event in events
+    ]
 
-    for word in search_words:
-        expanded_words.update(related_words.get(word, []))
+    query_embedding = semantic_model.encode(
+        query,
+        convert_to_tensor=True
+    )
 
-    matched_events = []
+    event_embeddings = semantic_model.encode(
+        event_texts,
+        convert_to_tensor=True
+    )
 
-    for event in events:
-        event_text = (
-            f'{event.title} '
-            f'{event.category} '
-            f'{event.description} '
-            f'{event.venue}'
-        ).lower()
+    similarity_scores = util.cos_sim(
+        query_embedding,
+        event_embeddings
+    )[0]
 
-        score = 0
-
-        for word in expanded_words:
-            if word in event_text:
-                score += 1
-
-        if score > 0:
-            matched_events.append((score, event))
-
-    matched_events.sort(
+    ranked_results = sorted(
+        zip(similarity_scores.tolist(), events),
         key=lambda result: result[0],
         reverse=True
     )
 
-    return [event for score, event in matched_events]
+    return [
+        event
+        for score, event in ranked_results
+        if score >= 0.25
+    ]
+
+    
+    
+    
