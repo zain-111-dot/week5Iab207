@@ -1,38 +1,85 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">My Bookings</h1>
-    
-    {% if orders %}
-    <div class="table-responsive">
-        <table class="table table-hover table-striped align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Order ID</th>
-                    <th>Event</th>
-                    <th>Event Date</th>
-                    <th>Quantity</th>
-                    <th>Total Price</th>
-                    <th>Booking Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>#{{ order.id }}</td>
-                    <td><a href="{{ url_for('views.event_details', event_id=order.event.id) }}">{{ order.event.title }}</a></td>
-                    <td>{{ order.event.date.strftime('%d %b %Y') }}</td>
-                    <td>{{ order.quantity }}</td>
-                    <td>${{ "%.2f"|format(order.price) }}</td>
-                    <td>{{ order.booking_date.strftime('%d %b %Y, %H:%M') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold"><i class="bi bi-ticket-perforated"></i> My Bookings</h1>
+        <a href="{{ url_for('views.index') }}" class="btn btn-outline-primary">Browse More Events</a>
     </div>
+
+    {% if orders %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Order ID</th>
+                            <th>Event</th>
+                            <th>Date & Time</th>
+                            <th class="text-center">Qty</th>
+                            <th>Total Price</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td class="ps-4 fw-bold">#{{ order.id }}</td>
+                            
+                            <!-- Event Info with Image -->
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if order.event.image_url %}
+                                        <img src="{{ order.event.image_url }}" alt="{{ order.event.title }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='img/sample_event.jpg') }}" alt="Event" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ order.event.title }}</h6>
+                                        <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ order.event.venue }}</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Event Date & Time -->
+                            <td>
+                                <div>{{ order.event.date.strftime('%d %b %Y') }}</div>
+                                <small class="text-muted">{{ order.event.start_time.strftime('%H:%M') }}</small>
+                            </td>
+
+                            <!-- Quantity -->
+                            <td class="text-center">
+                                <span class="badge bg-secondary rounded-pill">{{ order.quantity }}x</span>
+                            </td>
+
+                            <!-- Price -->
+                            <td class="fw-bold text-success">
+                                ${{ "%.2f"|format(order.price) }}
+                            </td>
+
+                            <!-- Action Button & Status -->
+                            <td class="text-center">
+                                <a href="{{ url_for('views.event_details', event_id=order.event.id) }}" class="btn btn-sm btn-primary mb-1 w-100">View Event</a>
+                                <span class="badge {% if order.event.status == 'Open' %}bg-success{% elif order.event.status == 'Cancelled' %}bg-danger{% else %}bg-secondary{% endif %} w-100">
+                                    {{ order.event.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
     {% else %}
-    <div class="alert alert-info">
-        You haven't made any bookings yet.
+    <!-- Improved Empty State -->
+    <div class="text-center py-5">
+        <i class="bi bi-controller text-muted" style="font-size: 5rem;"></i>
+        <h3 class="mt-3">No bookings yet!</h3>
+        <p class="text-muted">Looks like you haven't secured your spot at any gaming events.</p>
+        <a href="{{ url_for('views.index') }}" class="btn btn-primary btn-lg mt-2">Explore Events Now</a>
     </div>
     {% endif %}
 </div>
